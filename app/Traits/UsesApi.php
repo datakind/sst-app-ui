@@ -26,8 +26,8 @@ trait UsesApi
     {
         $response = Http::withHeaders([
             'Cache-Control' => 'no-cache',
-            'subscription-key' => 'bb9ce89dec064c6a97eae69656bf0d89',
-        ])->get(env('DK_API_SUITE_URL') . 'authenticate/get_jwt?api=sst');
+            'subscription-key' => env('DK_API_SUITE_SUBSCRIPTION_KEY'),
+        ])->get(env('DK_API_SUITE_URL') . 'authenticate/get_jwt?api=' . env('DK_API_SUITE_PRODUCT'));
         $body = json_decode($response->body());
         $token = !empty($token_id) ? DkApiToken::where('id', $token_id)->first() : new DkApiToken();
         $token->access = $body->access_token;

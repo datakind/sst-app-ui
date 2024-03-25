@@ -36,5 +36,5 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::get('/apitest', [ApiController::class, 'testApi'])->name('api.test');
+//Route::get('/apitest', [ApiController::class, 'testApi'])->name('api.test');
 
