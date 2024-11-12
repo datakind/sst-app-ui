@@ -1,15 +1,14 @@
 import { useForm } from '@inertiajs/react';
 import classNames from 'classnames';
 import React, { useRef, useState } from 'react';
-import useRoute from '@/Hooks/useRoute';
-import ActionSection from '@/Components/ActionSection';
-import DangerButton from '@/Components/DangerButton';
-import DialogModal from '@/Components/DialogModal';
-import TextInput from '@/Components/TextInput';
-import InputError from '@/Components/InputError';
-import SecondaryButton from '@/Components/SecondaryButton';
+import {router} from '@inertiajs/react';
+import ActionSection from '@/Components/Sections/ActionSection';
+import DangerButton from '@/Components/Buttons/DangerButton';
+import DialogModal from '@/Components/Modals/DialogModal';
+import TextInput from '@/Components/Fields/TextInput';
+import InputError from '@/Components/Modals/InputError';
+import SecondaryButton from '@/Components/Buttons/SecondaryButton';
 export default function DeleteUserForm() {
-    const route = useRoute();
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const form = useForm({
         password: '',

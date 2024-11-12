@@ -5,3 +5,41 @@
 [x-cloak] {
     display: none;
 }
+
+input[type="text"].mapboxgl-ctrl-geocoder--input[placeholder="Search"] {
+    @apply px-8;
+}
+
+.text-header {
+    @apply font-sans font-bold text-5xl;
+}
+
+.text-subheader {
+    @apply font-sans text-2xl leading-normal tracking-normal font-normal;
+}
+
+.text-section {
+    @apply font-sans font-bold text-2xl;
+}
+
+.text-feature {
+    @apply font-serif text-lg;
+}
+
+.text-body {
+    @apply font-serif text-base;
+}
+
+.text-navigation {
+    @apply font-sans hover:font-bold text-base hover:text-gray-500 hover:underline active:text-gray-500 active:underline;
+}
+
+.text-detail {
+    @apply font-sans font-[600] text-base;
+}
+
+a {
+    @apply text-blue-700;
+}
+
+

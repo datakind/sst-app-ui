@@ -1,13 +1,12 @@
 import { Link, useForm, Head } from '@inertiajs/react';
 import classNames from 'classnames';
 import React from 'react';
-import useRoute from '@/Hooks/useRoute';
-import AuthenticationCard from '@/Components/AuthenticationCard';
-import PrimaryButton from '@/Components/PrimaryButton';
+import {router} from '@inertiajs/react';
+import AuthenticationCard from '@/Components/Modals/AuthenticationCard';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
 import AppLayout from "@/Layouts/AppLayout";
 
 export default function VerifyEmail({ status }) {
-    const route = useRoute();
     const form = useForm({});
     const verificationLinkSent = status === 'verification-link-sent';
     function onSubmit(e) {

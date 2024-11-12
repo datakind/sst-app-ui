@@ -1,23 +1,22 @@
 import { useForm } from '@inertiajs/react';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import useRoute from '@/Hooks/useRoute';
-import ActionMessage from '@/Components/ActionMessage';
-import ActionSection from '@/Components/ActionSection';
-import Checkbox from '@/Components/Checkbox';
-import ConfirmationModal from '@/Components/ConfirmationModal';
-import DangerButton from '@/Components/DangerButton';
-import DialogModal from '@/Components/DialogModal';
-import FormSection from '@/Components/FormSection';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import SecondaryButton from '@/Components/SecondaryButton';
-import SectionBorder from '@/Components/SectionBorder';
+import {router} from '@inertiajs/react';
+import ActionMessage from '@/Components/Modals/ActionMessage';
+import ActionSection from '@/Components/Sections/ActionSection';
+import Checkbox from '@/Components/Fields/Checkbox';
+import ConfirmationModal from '@/Components/Modals/ConfirmationModal';
+import DangerButton from '@/Components/Buttons/DangerButton';
+import DialogModal from '@/Components/Modals/DialogModal';
+import FormSection from '@/Components/Sections/FormSection';
+import InputError from '@/Components/Modals/InputError';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import TextInput from '@/Components/Fields/TextInput';
+import SecondaryButton from '@/Components/Buttons/SecondaryButton';
+import SectionBorder from '@/Components/Fields/SectionBorder';
 import useTypedPage from '@/Hooks/useTypedPage';
 export default function APITokenManager({ tokens, availablePermissions, defaultPermissions, }) {
-    const route = useRoute();
     const createApiTokenForm = useForm({
         name: '',
         permissions: defaultPermissions,

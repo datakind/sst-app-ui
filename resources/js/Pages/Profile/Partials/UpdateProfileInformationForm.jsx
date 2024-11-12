@@ -1,15 +1,14 @@
-import { router } from '@inertiajs/core';
 import { Link, useForm } from '@inertiajs/react';
 import classNames from 'classnames';
 import React, { useRef, useState } from 'react';
-import useRoute from '@/Hooks/useRoute';
-import ActionMessage from '@/Components/ActionMessage';
-import FormSection from '@/Components/FormSection';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import SecondaryButton from '@/Components/SecondaryButton';
+import {router} from '@inertiajs/react';
+import ActionMessage from '@/Components/Modals/ActionMessage';
+import FormSection from '@/Components/Sections/FormSection';
+import InputError from '@/Components/Modals/InputError';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import TextInput from '@/Components/Fields/TextInput';
+import SecondaryButton from '@/Components/Buttons/SecondaryButton';
 import useTypedPage from '@/Hooks/useTypedPage';
 export default function UpdateProfileInformationForm({ user }) {
     const form = useForm({
@@ -18,7 +17,6 @@ export default function UpdateProfileInformationForm({ user }) {
         email: user.email,
         photo: null,
     });
-    const route = useRoute();
     const [photoPreview, setPhotoPreview] = useState(null);
     const photoRef = useRef(null);
     const page = useTypedPage();

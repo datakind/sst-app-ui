@@ -1,16 +1,15 @@
-import { router } from '@inertiajs/core';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import ActionSection from '@/Components/ActionSection';
-import ConfirmsPassword from '@/Components/ConfirmsPassword';
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
+import ActionSection from '@/Components/Sections/ActionSection';
+import ConfirmsPassword from '@/Components/Modals/ConfirmsPassword';
+import DangerButton from '@/Components/Buttons/DangerButton';
+import InputError from '@/Components/Modals/InputError';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import SecondaryButton from '@/Components/Buttons/SecondaryButton';
+import TextInput from '@/Components/Fields/TextInput';
 import useTypedPage from '@/Hooks/useTypedPage';
 export default function TwoFactorAuthenticationForm({ requiresConfirmation, }) {
     const page = useTypedPage();

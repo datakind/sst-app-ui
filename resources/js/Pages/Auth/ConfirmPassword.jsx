@@ -1,16 +1,15 @@
 import { useForm, Head } from '@inertiajs/react';
 import classNames from 'classnames';
 import React from 'react';
-import useRoute from '@/Hooks/useRoute';
-import AuthenticationCard from '@/Components/AuthenticationCard';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import {router} from '@inertiajs/react';
+import AuthenticationCard from '@/Components/Modals/AuthenticationCard';
+import InputError from '@/Components/Modals/InputError';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import TextInput from '@/Components/Fields/TextInput';
 import AppLayout from "@/Layouts/AppLayout";
 
 export default function ConfirmPassword() {
-    const route = useRoute();
     const form = useForm({
         password: '',
     });

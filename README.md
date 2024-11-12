@@ -1,66 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<a href="https://github.com/datakind/sst-app-ui/actions"><img src="https://github.com/datakind/sst-app-ui/actions/workflows/laravel.yml/badge.svg" alt="Build Status"></a>
 </p>
 
-## About Laravel
+## About the Student Success Tool
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Frameworks Used
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+the Student Success Tool is built on:
 
-## Learning Laravel
+* Laravel Framework. [Documentation](https://laravel.com/docs)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* Inertiajs. [Documentation](https://inertiajs.com)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* Reactjs. [Documentation](https://reactjs.org/docs/getting-started.html)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* Tailwindcss. [Documentation](https://v2.tailwindcss.com/docs)
 
-## Laravel Sponsors
+## Local Development
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+1. Clone this project
+2. <code>cd [project-name]</code>
+3. <code>composer install</code>
+4. Copy <code>.env.example</code> file to <code>.env</code> on the root folder.
+5. Open your <code>.env</code> file. Update DB_ and DK_API_SUITE_ credentials.
+6. <code>./vendor/bin/sail artisan key:generate</code>
+7. <code>./vendor/bin/sail artisan migrate</code>
+8. <code>./vendor/bin/sail artisan serve</code>
+9. <code>docker exec -it [your-project-container] /bin/sh</code>
+10. Change to user sail <code>su sail</code>
+11. Run <code>php artisan storage:link</code> and exit twice to get out of the container.
+12. Go to http://localhost/
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Setup (one-time)
+1. `brew install composer` (Assuming you are on Mac, but install as you think best)
+2. Check out git repo [sst-app-ui](https://github.com/datakind/sst-app-ui). You likely will want to check out the develop branch with `git checkout develop`
+3. cd into repo top folder you just checked out
+4. `composer install`
+5. Find 'sst-app-ui.env' in LastPass and save contents to .env
+6. Start sail: `./vendor/bin/sail up -d`
+7. `./vendor/bin/sail artisan key:generate`
+8. `./vendor/bin/sail artisan migrate`
+9. `docker exec -it [your-project-container] /bin/sh` where you container will be something like `sst-app-ui-laravel.test-1`
+10. `su sail`
+11. `php artisan storage:link`
+12. `npm install`
+13. CTRL-D twice to exit
+14. Stop sail: `./vendor/bin/sail stop`
 
-## Code of Conduct
+### To run the environment:
+1. Start sail: `./vendor/bin/sail up -d`
+2. In one terminal window start artisan: `./vendor/bin/sail artisan serve`
+3. In another terminal: `docker exec -it [your-project-container] /bin/sh`
+4. `npm run dev`
+5. Go to http://localhost/
+6. If you don't have an account, register
+7. Login
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

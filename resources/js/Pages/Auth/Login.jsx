@@ -1,16 +1,15 @@
 import { Link, useForm, Head } from '@inertiajs/react';
 import classNames from 'classnames';
 import React from 'react';
-import useRoute from '@/Hooks/useRoute';
-import AuthenticationCard from '@/Components/AuthenticationCard';
-import Checkbox from '@/Components/Checkbox';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import InputError from '@/Components/InputError';
+import {router} from '@inertiajs/react';
+import AuthenticationCard from '@/Components/Modals/AuthenticationCard';
+import Checkbox from '@/Components/Fields/Checkbox';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import TextInput from '@/Components/Fields/TextInput';
+import InputError from '@/Components/Modals/InputError';
 import AppLayout from "@/Layouts/AppLayout";
 export default function Login({ canResetPassword, status }) {
-    const route = useRoute();
     const form = useForm({
         email: '',
         password: '',
@@ -71,6 +70,24 @@ export default function Login({ canResetPassword, status }) {
                         </div>
                     </div>
                 </form>
+                <div className="flex flex-col space-y-4 mt-12">
+                    <a href="/auth/google" className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100">
+                        <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                            alt="Google Logo"
+                            className="w-5 h-5 mr-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Sign in with Google</span>
+                    </a>
+                    <a href="/auth/azure" className="flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100">
+                        <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png"
+                            alt="Microsoft Logo"
+                            className="w-5 h-5 mr-2"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Sign in with Microsoft</span>
+                    </a>
+                </div>
             </div>
         </AppLayout>
         );

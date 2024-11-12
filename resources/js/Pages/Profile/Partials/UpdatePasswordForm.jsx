@@ -1,15 +1,14 @@
 import { useForm } from '@inertiajs/react';
 import classNames from 'classnames';
 import React, { useRef } from 'react';
-import useRoute from '@/Hooks/useRoute';
-import ActionMessage from '@/Components/ActionMessage';
-import FormSection from '@/Components/FormSection';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import {router} from '@inertiajs/react';
+import ActionMessage from '@/Components/Modals/ActionMessage';
+import FormSection from '@/Components/Sections/FormSection';
+import InputError from '@/Components/Modals/InputError';
+import InputLabel from '@/Components/Fields/InputLabel';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import TextInput from '@/Components/Fields/TextInput';
 export default function UpdatePasswordForm() {
-    const route = useRoute();
     const form = useForm({
         current_password: '',
         password: '',

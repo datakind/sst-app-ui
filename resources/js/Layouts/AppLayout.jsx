@@ -2,104 +2,173 @@ import { router } from '@inertiajs/core';
 import { Link, Head, usePage } from '@inertiajs/react';
 import classNames from 'classnames';
 import React, { useState, useEffect } from 'react';
-import useRoute from '@/Hooks/useRoute';
 import useTypedPage from '@/Hooks/useTypedPage';
-import Dropdown from '@/Components/Dropdown';
-import AppLogo from '@/Icons/AppLogo';
-//import ReactGA from "react-ga4";
-//ReactGA.initialize("G-WNT7KSPY8N");
-import {ChevronDownIcon} from '@heroicons/react/24/outline'
+import Dropdown from '@/Components/Fields/Dropdown';
+import AppLogo from '@/Components/Icons/AppLogo';
+import { ChevronDownIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 
-
-export default function AppLayout({ title, renderHeader, children, }) {
-    const user = usePage().props.auth.user;
+export default function AppLayout({ title, renderHeader, children }) {
+    const { auth, jetstream } = useTypedPage().props;
+    const user = auth.user;
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     useEffect(() => {
-        const handleResize = () => {setIsMobile(window.innerWidth < 768);};
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
-        return () => {window.removeEventListener('resize', handleResize);};
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
-    let profilePhoto;
-    if(user !== null) {profilePhoto = 'https://ui-avatars.com/api/?name=' + user.name + '&color=717171&background=ffffff'}else{profilePhoto = 'none'};
+
+    const profilePhoto = user
+        ? `https://ui-avatars.com/api/?name=${user.name}&color=303030&background=ffffff`
+        : 'none';
+
     const pathname = window.location.pathname;
+    const openFeedbackForm = () => {
+        const feedbackFormUrl = import.meta.env.VITE_FEEDBACK_FORM_URL;
+        window.open(feedbackFormUrl, '_blank');
+    };
+
+
+    const renderNavLinks = () => (
+        ['home', 'FAQ', 'data-dictionary'].map((routeName) => (
+            <Link
+                key={routeName}
+                href={route(routeName)}
+                className={classNames('text-gray-900 hover:underline', {
+                    'text-primary underline': pathname === `/${routeName}`,
+                })}
+            >
+                {routeName
+                    .split('-')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')}
+            </Link>
+        ))
+    );
+
     if (isMobile) {
         return (
-            <div className="">
-                <div className="flex flex-row gap-4 items-center p-12 w-full bg-white shadow-md border-b z-50"><AppLogo/></div>
-                <div className="p-12">
-                    <div className="mb-4">This application is not optimized for mobile devices at this time. Please visit the site on desktop.</div>
-                </div>
-            </div>
-        );
-    } else {
-        return (
-            <div className="min-h-screen items-center pt-24">
-                <div className="sm:fixed sm:top-0 p-6 text-right w-full bg-white border-b shadow-md z-50">
-                    <div className="max-w-6xl mx-auto flex justify-between">
-                        <div className="flex items-justify-center items-center">
-                            <div className="flex flex-row gap-4 items-center mr-6"><AppLogo className="w-full"/></div>
-                            <div className="flex justify-between flex-grow items-center gap-6 text-nowrap text-sm">
-                                <Link href={route('home')}
-                                      className={pathname.length===1 ? 'text-gray' : 'text-gray-light hover:text-gray'}>
-                                    Home
-                                </Link>
-                                <Link href={route('resources')}
-                                      className={pathname === '/resources' ? 'text-gray' : 'text-gray-light hover:text-gray'}>
-                                    Resources
-                                </Link>
-                                <Link href={route('documentation')}
-                                      className={pathname === '/documentation' ? 'text-gray' : 'text-gray-light hover:text-gray'}>
-                                    Documentation
-                                </Link>
-                                <Link href={route('explore-data')}
-                                      className={pathname === '/explore-data' ? 'bg-transparent rounded-lg text-primary py-2 px-4 border border-primary' : 'bg-primary rounded-lg text-white py-2 px-4 border border-primary hover:bg-transparent hover:text-primary'}>
-                                    Explore the Data
-                                </Link>
-                            </div>
-                        </div>
-                        <div className={user === null ? 'sm:right-0 flex text-nowrap text-sm items-justify-center items-center gap-6' : 'hidden'}>
-                            <Link href={route('login')} className={pathname.includes('/login') ? 'text-gray' : 'text-gray-light hover:text-gray'}>
-                                Sign in
-                            </Link>
-                            <Link href={route('register')} className={pathname.includes('/register') ? 'bg-transparent rounded-lg text-primary py-2 px-4 border border-primary hover:bg-primary hover:text-white' : 'bg-primary rounded-lg text-white py-2 px-4 border border-primary hover:bg-transparent hover:text-primary'}>
-                                Sign Up
-                            </Link>
-                        </div>
-                        <div className={user !== null ? 'ml-9 relative items-justify-center items-center' : 'hidden'}>
-                            <Dropdown>
-                                <Dropdown.Trigger>
-                                <span className="inline-flex rounded-md">
-                                    <button type="button"
-                                            className="inline-flex items-center px-3 py-2 border border-transparent leading-4 font-medium rounded-md text-navigation focus:outline-none transition ease-in-out duration-150">
-                                        <img className="h-8 w-8 rounded-full border border-gray-light"
-                                             src={profilePhoto}></img>
-                                        <ChevronDownIcon className="pl-1 h-4 w-4"/>
-                                    </button>
-                                </span>
-                                </Dropdown.Trigger>
-                                <Dropdown.Content>
-                                    <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                    <Dropdown.Link href={route('dashboard')}>Activity</Dropdown.Link>
-                                    <Dropdown.Link href={route('logout')} method="post" as="button">Log
-                                        Out</Dropdown.Link>
-                                </Dropdown.Content>
-                            </Dropdown>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="pt-6 min-h-screen px-12">{children}</div>
-                <div className="bottom-0 py-6 bg-background shadow-md grid justify-center w-full">
-                    <div className="grid grid-cols-3 text-center text-sm min-w-[30rem]">
-                        <Link href={route('privacy-policy')} className="max-w-[8rem] text-right hover:underline">Privacy
-                            Policy</Link>
-                        <Link href={route('terms-of-service')} className="max-w-[8rem] mx-auto hover:underline">Terms of
-                            Service</Link>
-                        <Link href={route('license')} className="max-w-[8rem] hover:underline">License</Link>
-                    </div>
-                </div>
+            <div className="min-h-screen flex flex-col">
+                <header className="flex items-center justify-between p-4 bg-gray-900 text-secondary-dark">
+                    <AppLogo />
+                    <nav className="flex items-center gap-4">
+                        {renderNavLinks()}
+                    </nav>
+                </header>
+                <main className="flex flex-col items-center p-6">
+                    <p className="text-center text-gray-700">
+                        This application is not optimized for mobile devices at this time. Please visit the site on desktop.
+                    </p>
+                </main>
             </div>
         );
     }
+
+    return (
+        <div className="bg-background">
+            <header className="sticky top-0 w-full bg-white shadow-md z-50">
+                <div className="flex items-center justify-between p-6 border-b">
+                    <div className="flex items-center gap-4">
+                        <a href={route('home')}>
+                            <AppLogo className="w-32 h-auto" />
+                        </a>
+                    </div>
+                    <div>
+                        <nav className={classNames('flex items-center gap-6', { 'hidden': !user })}>
+                            {renderNavLinks()}
+                        </nav>
+                        {user ? (
+                            <div className="flex items-center gap-4 pt-4 justify-end">
+                                <Dropdown>
+                                    <Dropdown.Trigger>
+                                        <button className="flex items-center gap-2 text-gray-900">
+                                            <img
+                                                className="h-8 w-8 rounded-full border border-secondary-dark"
+                                                src={profilePhoto}
+                                                alt="User Profile"
+                                            />
+                                            <ChevronDownIcon className="h-4 w-4" />
+                                        </button>
+                                    </Dropdown.Trigger>
+                                    <Dropdown.Content>
+                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                        <Dropdown.Link href={route('teams.show', user.current_team)}>
+                                            Team Settings
+                                        </Dropdown.Link>
+                                        {jetstream.hasTeamFeatures && (
+                                            <>
+                                                {jetstream.canCreateTeams && (
+                                                    <Dropdown.Link href={route('teams.create')}>
+                                                        Create New Team
+                                                    </Dropdown.Link>
+                                                )}
+                                                {user.all_teams.length > 1 && (
+                                                    <>
+                                                        <div className="border-t border-gray-200" />
+                                                        <div className="block px-4 py-2 text-xs text-gray-400">
+                                                            Switch Teams
+                                                        </div>
+                                                        {user.all_teams.map((team) => (
+                                                            <form key={team.id} onSubmit={(e) => {
+                                                                e.preventDefault();
+                                                                switchToTeam(team);
+                                                            }}>
+                                                                <Dropdown.Link as="button">
+                                                                    <div className="flex items-center">
+                                                                        {team.id === user.current_team_id && (
+                                                                            <svg className="me-2 h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                            </svg>
+                                                                        )}
+                                                                        <div>{team.name}</div>
+                                                                    </div>
+                                                                </Dropdown.Link>
+                                                            </form>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
+                                        <Dropdown.Link href={route('logout')} method="post" as="button">
+                                            Log Out
+                                        </Dropdown.Link>
+                                    </Dropdown.Content>
+                                </Dropdown>
+                            </div>
+                        ) : (
+                            <div className="flex gap-6 items-center">
+                                <Link href={route('login')} className="text-secondary-dark hover:text-secondary hover:underline">
+                                    Sign in
+                                </Link>
+                                <Link
+                                    href={route('register')}
+                                    className="px-4 py-2 rounded-full bg-primary text-white border border-primary hover:bg-transparent hover:text-primary"
+                                >
+                                    Sign up
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </header>
+            <div className="z-50 cursor-pointer fixed bottom-10 hover:bg-primary-dark shadow-md right-10 bg-primary rounded-full p-2 px-4 text-white text-sm">
+                <button onClick={openFeedbackForm}>Feedback</button>
+            </div>
+            <main className="pt-12 min-h-screen">{children}</main>
+
+            <footer className="py-6 bg-gray-300 shadow-inner text-center">
+                <nav className="flex justify-center gap-8 text-sm text-secondary-dark font-semibold pr-12">
+                    <Link href={route('privacy-policy')} className="text-secondary-dark hover:underline hover:text-secondary">
+                        Privacy Policy
+                    </Link>
+                    <Link href={route('terms-of-service')} className="text-secondary-dark hover:underline hover:text-secondary">
+                        Terms of Service
+                    </Link>
+                    <Link href={route('license')} className="text-secondary-dark hover:underline hover:text-secondary">
+                        License
+                    </Link>
+                </nav>
+            </footer>
+        </div>
+    );
 }

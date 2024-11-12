@@ -5,7 +5,7 @@ import TwoFactorAuthenticationForm from '@/Pages/Profile/Partials/TwoFactorAuthe
 import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import useTypedPage from '@/Hooks/useTypedPage';
-import SectionBorder from '@/Components/SectionBorder';
+import SectionBorder from '@/Components/Fields/SectionBorder';
 import AppLayout from '@/Layouts/AppLayout';
 export default function Show({ sessions, confirmsTwoFactorAuthentication, }) {
     const page = useTypedPage();

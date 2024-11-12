@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataDictionary;
 use App\Traits\UsesApi;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -14,50 +15,23 @@ class ApiController extends Controller
 {
     use UsesApi;
 
-    public function testApi()
+    public function exampleFunction(Request $request)
     {
-        $response = $this->authenticateDkApi();
+        $query = http_build_query($request->query());
+        $token = $this->authenticateDkApi(null);
+        $endpoint = 'product/endpoint';
+        $headers = [
+            'Authorization' => $token->access,
+            'Cache-Control' => 'no-cache',
+        ];
+        $response = Http::withHeaders($headers)->get(env('DK_API_SUITE_URL') . '/' . env('DK_API_SUITE_VERSION') . '/' . $endpoint . '?' . $query);
         return $response;
+    }
 
-    }
-    public function getInsights()
+    protected function readDataDictionary(): mixed
     {
-        $response = $this->getInsights();
+        $response = DataDictionary::all();
         return $response;
     }
-    public function postModelRegistry()
-    {
-        $response = $this->postModelRegistry();
-        return $response;
-    }
-    public function getModelRegistry()
-    {
-        $response = $this->getModelRegistry();
-        return $response;
-    }
-    public function getTrainingAssets()
-    {
-        $response = $this->getTrainingAssets();
-        return $response;
-    }
-    public function postTrainingData(Request $request)
-    {
-        $token = $this->authenticateDkApi();
-        $queryParameters = $request->query->all();
-        $queryString = http_build_query($queryParameters);
-        $response = Http::withToken($token->access)
-            ->get(env('DK_API_SUITE_URL') . 'sst/training_data_upload?' . $queryString);
-        dd($response);
-        return $response;
-    }
-    public function getTrainingStatus(Request $request)
-    {
-        $token = $this->authenticateDkApi();
-        $queryParameters = $request->query->all();
-        $queryString = http_build_query($queryParameters);
-        $response = Http::withToken($token->access)
-            ->get(env('DK_API_SUITE_URL') . 'sst/retrieve_training_status?' . $queryString);
-        dd($response);
-        return $response;
-    }
+
 }

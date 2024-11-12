@@ -22,7 +22,7 @@ trait UsesApi
      * @param string $token_id
      * @return mixed
      */
-    protected function authenticateDkApi(string $token_id = null)
+    protected function authenticateDkApi(string $token_id = null): mixed
     {
         $response = Http::withHeaders([
             'Cache-Control' => 'no-cache',
@@ -38,20 +38,23 @@ trait UsesApi
     }
 
     /**
-     * Get insights from DK API Suite
+     * Formats DK API Suite request URL string and sends Request to API and decodes JSON response
      *
-     * @param string $study
-     * @param string|null $token_id
-     * @return \Illuminate\Http\Client\Response
+     * @param string $token
+     * @param string $endpoint
+     * @param string $type
+     * @return mixed
      */
-    public static function getInsights(string $study, string $token_id = null)
+    protected function makesDkApiRequest(string $token, string $endpoint, string $type = 'get'): mixed
     {
-        $token = self::authenticateDkApi($token_id);
 
-        $response = Http::withToken($token->access)
-            ->get(env('DK_API_SUITE_URL') . '/studies/' . $study);
+        if ($type == 'post') {
+            $response = Http::withToken($token)->post(env('DK_API_SUITE_URL') . '/' . env('DK_API_SUITE_VERSION') . $endpoint);
+        } else {
+            $response = Http::withToken($token)->get(env('DK_API_SUITE_URL') . '/' . env('DK_API_SUITE_VERSION') . $endpoint);
+        }
 
-        return $response;
+        return json_decode($response->body());
     }
 
 }
