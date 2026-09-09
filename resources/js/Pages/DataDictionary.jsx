@@ -168,7 +168,10 @@ const MODEL_CARD_SECTIONS = [
   },
 ];
 
-export default function DataDictionary({ features = [] }) {
+export default function DataDictionary({
+  features = [],
+  selectedModel = null,
+}) {
   usePage().props; // shared props (e.g. institution) available if needed
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('readable_feature_name');
@@ -243,8 +246,8 @@ export default function DataDictionary({ features = [] }) {
           <div className="mb-10">
             <TabGroup className="data-dictionary-tabs">
               <TabList>
-                <Tab>Output Data Format</Tab>
-                <Tab>Original Indicator Value Table</Tab>
+                <Tab>Understanding Your Results</Tab>
+                {selectedModel && <Tab>Indicator Glossary</Tab>}
                 <Tab>Data Science Terminology</Tab>
               </TabList>
               {/* Original Feature Value Table Section */}
@@ -392,106 +395,110 @@ export default function DataDictionary({ features = [] }) {
                     by the model.
                   </p>
                 </TabPanel>
-                <TabPanel>
-                  <div className="relative ml-4 w-64">
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <svg
-                        className="h-5 w-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
+                {selectedModel && (
+                  <TabPanel>
+                    <div className="relative ml-4 w-64">
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <svg
+                          className="h-5 w-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
-                  <p className="my-4 text-base font-light">
-                    Download your Original Indicator Value Table{' '}
-                    <a
-                      className="text-link font-medium underline"
-                      download="original_indicator_value_table.csv"
-                      href={`data:text/csv;charset=utf-8,${encodeURIComponent(
-                        ['INDICATOR NAME,DESCRIPTION']
-                          .concat(
-                            filteredAndSortedFeatures.map(
-                              feature =>
-                                `"${toTitleCase(feature.readable_feature_name ?? '').replace(/"/g, '""')}","${(feature.short_feature_desc ?? '').replace(/"/g, '""')}"`,
-                            ),
-                          )
-                          .join('\n'),
-                      )}`}
-                    >
-                      here
-                    </a>
-                    .
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-[#e5e7eb]">
-                      <thead>
-                        <tr className="bg-[#f9fafb]">
-                          <th
-                            scope="col"
-                            className="cursor-pointer border border-[#e5e7eb] p-3 text-left text-xs font-medium text-[#6B7280]"
-                            onClick={() => handleSort('readable_feature_name')}
-                          >
-                            <div className="flex items-center gap-2">
-                              INDICATOR NAME
-                              <svg
-                                className="h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                                />
-                              </svg>
-                            </div>
-                          </th>
-                          <th
-                            scope="col"
-                            className="border border-[#e5e7eb] p-3 text-left text-xs font-medium text-[#6B7280]"
-                          >
-                            DESCRIPTION
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredAndSortedFeatures.map(feature => (
-                          <tr
-                            key={feature.readable_feature_name}
-                            className="border-b border-[#E5E7EB] align-top last:border-b-0"
-                          >
-                            <td className="border border-[#e5e7eb] py-3 pr-4 pl-4">
-                              <div className="text-base font-medium text-black">
-                                {toTitleCase(feature.readable_feature_name)}
+                    <p className="my-4 text-base font-light">
+                      Download your Indicator Glossary{' '}
+                      <a
+                        className="text-link font-medium underline"
+                        download="indicator_glossary.csv"
+                        href={`data:text/csv;charset=utf-8,${encodeURIComponent(
+                          ['INDICATOR NAME,DESCRIPTION']
+                            .concat(
+                              filteredAndSortedFeatures.map(
+                                feature =>
+                                  `"${toTitleCase(feature.readable_feature_name ?? '').replace(/"/g, '""')}","${(feature.short_feature_desc ?? '').replace(/"/g, '""')}"`,
+                              ),
+                            )
+                            .join('\n'),
+                        )}`}
+                      >
+                        here
+                      </a>
+                      .
+                    </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse border border-[#e5e7eb]">
+                        <thead>
+                          <tr className="bg-[#f9fafb]">
+                            <th
+                              scope="col"
+                              className="cursor-pointer border border-[#e5e7eb] p-3 text-left text-xs font-medium text-[#6B7280]"
+                              onClick={() =>
+                                handleSort('readable_feature_name')
+                              }
+                            >
+                              <div className="flex items-center gap-2">
+                                INDICATOR NAME
+                                <svg
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                  />
+                                </svg>
                               </div>
-                            </td>
-                            <td className="border border-[#e5e7eb] py-3 pr-4 pl-4">
-                              <div className="text-base font-light text-[#696969]">
-                                {feature.short_feature_desc}
-                              </div>
-                            </td>
+                            </th>
+                            <th
+                              scope="col"
+                              className="border border-[#e5e7eb] p-3 text-left text-xs font-medium text-[#6B7280]"
+                            >
+                              DESCRIPTION
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </TabPanel>
+                        </thead>
+                        <tbody>
+                          {filteredAndSortedFeatures.map(feature => (
+                            <tr
+                              key={feature.readable_feature_name}
+                              className="border-b border-[#E5E7EB] align-top last:border-b-0"
+                            >
+                              <td className="border border-[#e5e7eb] py-3 pr-4 pl-4">
+                                <div className="text-base font-medium text-black">
+                                  {toTitleCase(feature.readable_feature_name)}
+                                </div>
+                              </td>
+                              <td className="border border-[#e5e7eb] py-3 pr-4 pl-4">
+                                <div className="text-base font-light text-[#696969]">
+                                  {feature.short_feature_desc}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </TabPanel>
+                )}
                 <TabPanel>
                   {/* Model Card Dictionary */}
                   <div>
@@ -549,4 +556,5 @@ export default function DataDictionary({ features = [] }) {
 
 DataDictionary.propTypes = {
   features: PropTypes.arrayOf(PropTypes.object),
+  selectedModel: PropTypes.object,
 };
