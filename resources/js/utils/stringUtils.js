@@ -16,16 +16,19 @@ export const formatModelName = str => {
       // Skip empty words
       if (!word) return '';
 
-      // Handle special cases like "4y" -> "4Y"
-      if (/^\d+[a-z]$/i.test(word)) {
-        return word.toUpperCase();
+      // UC stores 4.5y as 4d5y. Decode for display only.
+      const display = word.replace(/(\d+)d(\d+)(?=[yYmM])/g, '$1.$2');
+
+      // "4y" -> "4Y", "4.5y" / "4d5y" -> "4.5Y"
+      if (/^\d+(\.\d+)?[a-z]$/i.test(display)) {
+        return display.toUpperCase();
       }
       // Handle acronyms (all caps words)
-      if (/^[A-Z]+$/.test(word)) {
-        return word;
+      if (/^[A-Z]+$/.test(display)) {
+        return display;
       }
       // Regular word capitalization
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      return display.charAt(0).toUpperCase() + display.slice(1).toLowerCase();
     })
     .join(' ');
 };
