@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 
 class Invite extends Model
 {
+    /** @use HasFactory<\Illuminate\Database\Eloquent\Factories\Factory<static>> */
     use HasFactory;
 
     protected $fillable = [
@@ -70,6 +71,8 @@ class Invite extends Model
 
     /**
      * Get the user who sent this invite
+     *
+     * @return BelongsTo<User, $this>
      */
     public function invitedBy(): BelongsTo
     {
