@@ -73,7 +73,11 @@ class InstitutionHelper
         return ['', ''];
     }
 
-    // Fetch full institution by inst_id from backend. Returns array or null.
+    /**
+     * Fetch full institution by inst_id from backend. Returns array or null.
+     *
+     * @return array<string, mixed>|null
+     */
     public static function fetchInstitutionById(Request $request, string $inst_id): ?array
     {
         [$tok] = TokenHelper::GetToken($request);

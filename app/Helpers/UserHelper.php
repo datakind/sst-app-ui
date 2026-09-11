@@ -22,8 +22,12 @@ class UserHelper
         return '';
     }
 
-    // Returns a mapping of the names of a set of users given their user id.
-    // Returns false if no user found.
+    /**
+     * Returns a mapping of the names of a set of users given their user id.
+     * Returns false if no user found.
+     *
+     * @param  array<int, mixed>  $user_uuids
+     */
     public static function getNames(array $user_uuids)
     {
         $users = DB::table('users')->whereIn('id', $user_uuids)

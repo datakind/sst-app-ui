@@ -25,7 +25,11 @@ class DataDictionary extends Model
     // Indicate that the model should use timestamps
     public $timestamps = true;
 
-    // Add a method to parse and save the array data
+    /**
+     * Add a method to parse and save the array data.
+     *
+     * @param  array<int, mixed>  $data
+     */
     public static function createFromArray(array $data)
     {
         // Assuming the array structure is:
