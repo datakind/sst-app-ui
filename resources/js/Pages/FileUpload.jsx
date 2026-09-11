@@ -686,7 +686,7 @@ export default function FileUpload() {
     }
     axios({
       method: 'post',
-      url: '/run-inference/' + event.target.elements.model_name.value,
+      url: '/start-prediction/' + event.target.elements.model_name.value,
       data: {
         batch_name: batchName,
         is_pdp: true,

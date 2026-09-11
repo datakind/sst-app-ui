@@ -469,8 +469,8 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, '/download-url/'.urlencode($filename), 'GET', null);
     }
 
-    // Triggers inference run.
-    public function runInferenceApi(Request $request, string $model_name)
+    // Triggers prediction run.
+    public function startPredictionApi(Request $request, string $model_name)
     {
         $post_request_body = [
             'batch_name' => $request->input('batch_name'),
@@ -478,10 +478,8 @@ class ApiController extends Controller
         if ($request->input('is_pdp') != null) {
             $post_request_body['is_pdp'] = $request->input('is_pdp');
         }
-
-        if (ApiController::isLocalRequest()) {
-
-            return response()->json(['run_id' => '123', 'inst_id' => ($request->attributes->get('institution') ?? [])['inst_id'] ?? null, 'm_name' => $model_name, 'created_by' => $request->user()->id, 'triggered_at' => '2025-02-02T19:19:19'], 200);
+        if ($request->input('term_filter') != null) {
+            $post_request_body['term_filter'] = $request->input('term_filter');
         }
 
         return ApiController::constructInstRequest($request, '/models/'.urlencode($model_name).'/run-inference', 'POST', $post_request_body);
@@ -491,6 +489,12 @@ class ApiController extends Controller
     public function getModels(Request $request)
     {
         return ApiController::constructInstRequest($request, '/models', 'GET', null);
+    }
+
+    // Academic terms in a batch that have students eligible for the given model.
+    public function getEligibleInferenceTerms(Request $request)
+    {
+        return ApiController::constructInstRequest($request, '/eligible-inference-terms', 'GET', null);
     }
 
     // Returns file as bytes

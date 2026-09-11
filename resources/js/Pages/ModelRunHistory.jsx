@@ -265,7 +265,7 @@ export default function ModelRunHistory({ modelname }) {
                         <>
                           <div className="flex">Click below to begin one.</div>
                           <a
-                            href={route('run-inference')}
+                            href={route('start-prediction')}
                             className="flex items-center justify-center rounded-full border border-[#f79222] bg-white px-3 py-2 text-[#f79222]"
                           >
                             Start Prediction

@@ -1,3 +1,7 @@
-import mod from 'react-plotly.js';
+import plotlyMod from 'plotly.js';
+import factoryMod from 'react-plotly.js/factory';
 
-export default mod?.default ?? mod;
+const Plotly = plotlyMod?.default ?? plotlyMod;
+const createPlotlyComponent = factoryMod?.default ?? factoryMod;
+
+export default createPlotlyComponent(Plotly);

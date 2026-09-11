@@ -5,20 +5,27 @@ import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import BigSuccessAlert from '@/Components/BigSuccessAlert';
 import Alert from '@/Components/Alert';
+import Spinner from '@/Components/Spinner';
 
-export default function RunInference() {
-  const [currentStep] = useState(1);
+export default function StartPrediction() {
   const [triggeredRun, setTriggeredRun] = useState(false);
   const [result, setResult] = useState('');
 
   const [batchList, setBatchList] = useState([]);
   const [modelsList, setModelsList] = useState([]);
+  const [batchName, setBatchName] = useState('');
+  const [modelName, setModelName] = useState('');
+  const [terms, setTerms] = useState([]);
+  const [selectedTerms, setSelectedTerms] = useState([]);
+  const [loadingTerms, setLoadingTerms] = useState(false);
+  const [termsReason, setTermsReason] = useState(null);
   const [error, setError] = useState(null);
   useEffect(() => {
     axios
       .get('/models-api')
       .then(res => {
         setModelsList(res.data);
+        setModelName(res.data[0]?.name ?? '');
       })
       .catch(err => {
         if (
@@ -38,6 +45,7 @@ export default function RunInference() {
       .get('/view-uploaded-data')
       .then(res => {
         setBatchList(res.data.batches);
+        setBatchName(res.data.batches[0]?.name ?? '');
       })
       .catch(err => {
         if (
@@ -52,6 +60,34 @@ export default function RunInference() {
       });
   }, []);
 
+  useEffect(() => {
+    if (!batchName || !modelName) return;
+    let cancelled = false;
+    setLoadingTerms(true);
+    axios
+      .get('/eligible-inference-terms', {
+        params: { batch_name: batchName, model_name: modelName },
+      })
+      .then(res => {
+        if (cancelled) return;
+        setTerms(res.data.terms ?? []);
+        setSelectedTerms([]);
+        setTermsReason(res.data.status === 'invalid' ? res.data.reason : null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTerms([]);
+        setSelectedTerms([]);
+        setTermsReason('Could not load academic terms.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTerms(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [batchName, modelName]);
+
   const triggerInference = event => {
     event.preventDefault();
     // TODO: enable some way to indicate if it is pdp or not? is that required.
@@ -65,10 +101,12 @@ export default function RunInference() {
     }
     axios({
       method: 'post',
-      url: '/run-inference/' + event.target.elements.model_name.value,
+      url: '/start-prediction/' + event.target.elements.model_name.value,
       data: {
         batch_name: event.target.elements.batch_name.value,
         is_pdp: true,
+        // Omitted when nothing is checked, so the pipeline config decides.
+        term_filter: selectedTerms.length > 0 ? selectedTerms : null,
       },
     })
       .then(res => {
@@ -144,6 +182,8 @@ export default function RunInference() {
                 <select
                   className="mb-4 w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
                   id="batch_name"
+                  value={batchName}
+                  onChange={e => setBatchName(e.target.value)}
                 >
                   {batchList.map(b => (
                     <option key={b.batch_id ?? b.name}>{b.name}</option>
@@ -178,11 +218,59 @@ export default function RunInference() {
             <select
               className="mb-4 flex w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
               id="model_name"
+              value={modelName}
+              onChange={e => setModelName(e.target.value)}
             >
               {modelsList.map(m => (
                 <option key={m.name}>{m.name}</option>
               ))}
             </select>
+          )}
+          {loadingTerms ? (
+            <div className="flex w-full justify-center py-3">
+              <Spinner mainMsg="Loading academic terms"></Spinner>
+            </div>
+          ) : terms.length > 0 ? (
+            <>
+              <div className="py-3 font-thin">
+                <span className="text-2xl">Step 3</span>
+                <br />
+                <span className="text-lg">
+                  Please select the academic terms to predict.
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {terms.map(t => (
+                  <label
+                    key={t.term_label}
+                    className="flex items-center gap-x-2 text-gray-700"
+                  >
+                    <input
+                      type="checkbox"
+                      name="academic_terms"
+                      value={t.term_label}
+                      checked={selectedTerms.includes(t.term_label)}
+                      onChange={e =>
+                        setSelectedTerms(prev =>
+                          e.target.checked
+                            ? [...prev, t.term_label]
+                            : prev.filter(x => x !== t.term_label),
+                        )
+                      }
+                      className="rounded border-gray-300"
+                    />
+                    <span className="capitalize">{t.term_label}</span>
+                    <span className="text-sm text-gray-500">
+                      ({t.valid_student_count} students)
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </>
+          ) : (
+            termsReason && (
+              <div className="py-3 text-gray-700">{termsReason}</div>
+            )
           )}
           <div className="flex w-full items-end justify-end pt-12">
             <button type="submit" className="btn btn-primary">
@@ -199,7 +287,7 @@ export default function RunInference() {
       title="Start Prediction"
       renderHeader={() => (
         <h2 className="text-xl leading-tight font-semibold text-gray-800">
-          Run Inference
+          Start Prediction
         </h2>
       )}
     >
@@ -209,7 +297,7 @@ export default function RunInference() {
       >
         {triggeredRun
           ? renderResults(result, error)
-          : renderPredictionParamInputs(currentStep)}
+          : renderPredictionParamInputs()}
       </div>
     </AppLayout>
   );
