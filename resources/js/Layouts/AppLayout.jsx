@@ -62,7 +62,7 @@ var navigationAboveLine = [
       },
       {
         name: 'Start Prediction',
-        href: route('run-inference'),
+        href: route('start-prediction'),
         visibility_type: VisibilityType.DATAKIND_ONLY,
       },
       { name: 'Manage Uploads', href: route('manage-uploads') },

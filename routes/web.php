@@ -107,10 +107,11 @@ Route::middleware('auth.app')->group(function () {
     Route::get('/home', fn () => Inertia::render('Home'))->name('home');
     Route::post('/file-upload-api/{filename}', [ApiController::class, 'fileUploadApi']);
     Route::post('/file-validate-api/{filename}', [ApiController::class, 'fileValidateApi']);
-    Route::post('/run-inference/{model_name}', [ApiController::class, 'runInferenceApi']);
+    Route::post('/start-prediction/{model_name}', [ApiController::class, 'startPredictionApi']);
     Route::post('/create-batch', [ApiController::class, 'createBatch']);
     Route::post('/create-model', [ApiController::class, 'createModelApi']);
     Route::get('/models-api', [ApiController::class, 'getModels']);
+    Route::get('/eligible-inference-terms', [ApiController::class, 'getEligibleInferenceTerms']);
     Route::get('/support-overview/{run_id}', [ApiController::class, 'getSupportOverview']);
     Route::get('/institutions/{inst_id}/inference/support-overview/{run_id}', [ApiController::class, 'getSupportOverview']);
     Route::get('/institutions/{inst_id}/training/model-cards/{model_run_id}', [ApiController::class, 'downloadModelCard']);
@@ -119,7 +120,7 @@ Route::middleware('auth.app')->group(function () {
     Route::get('/view-input-data', [ApiController::class, 'viewInputData']);
     Route::get('/view-uploaded-data', [ApiController::class, 'viewUploadedData']);
     Route::get('/view-output-data', [ApiController::class, 'viewOutputData']);
-    Route::get('/run-inference', fn () => Inertia::render('RunInference'))->name('run-inference');
+    Route::get('/start-prediction', fn () => Inertia::render('StartPrediction'))->name('start-prediction');
     Route::get('/manage-uploads', fn () => Inertia::render('ManageUploads'))->name('manage-uploads');
     Route::get('/file-management', fn () => Inertia::render('FileManagement'))->name('file-management');
     Route::get('/download-inf-data/{filename}', [ApiController::class, 'downloadInfData'])->where('filename', '.*');
