@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -78,7 +79,10 @@ class Invite extends Model
     /**
      * Scope for valid invites
      */
-    public function scopeValid($query): mixed
+    /**
+     * @param  Builder<Invite>  $query
+     */
+    public function scopeValid(Builder $query): mixed
     {
         return $query->where('is_used', false)
             ->where('expires_at', '>', now());
@@ -87,7 +91,10 @@ class Invite extends Model
     /**
      * Scope for expired invites
      */
-    public function scopeExpired($query): mixed
+    /**
+     * @param  Builder<Invite>  $query
+     */
+    public function scopeExpired(Builder $query): mixed
     {
         return $query->where('expires_at', '<=', now());
     }
@@ -95,7 +102,10 @@ class Invite extends Model
     /**
      * Scope for unused invites
      */
-    public function scopeUnused($query): mixed
+    /**
+     * @param  Builder<Invite>  $query
+     */
+    public function scopeUnused(Builder $query): mixed
     {
         return $query->where('is_used', false);
     }

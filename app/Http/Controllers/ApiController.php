@@ -38,7 +38,7 @@ class ApiController extends Controller
      * WWW-Authenticate: Bearer only for a bad or expired token, never for the 401s
      * it returns for insufficient permissions.
      */
-    private static function expiredCredentialsResponse(Request $request, $resp): ?JsonResponse
+    private static function expiredCredentialsResponse(Request $request, HttpClientResponse $resp): ?JsonResponse
     {
         if ($resp->status() != 401 || ! str_contains($resp->header('WWW-Authenticate'), 'Bearer')) {
             return null;
@@ -69,7 +69,10 @@ class ApiController extends Controller
     }
 
     // Constructs a query for Datakinder cases that does not retrieve institution info.
-    public function constructDatakinderRequest(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse
+    /**
+     * @param  array<int|string, mixed>|null  $req_body
+     */
+    public function constructDatakinderRequest(Request $request, string $url_piece, string $method, ?array $req_body): JsonResponse|HttpClientResponse
     {
         [$tok, $tokErr] = TokenHelper::GetToken($request);
         if ($tok == '') {
@@ -241,7 +244,10 @@ class ApiController extends Controller
     }
 
     // Constructs a query with the BACKEND_URL+/institutions/<inst> prefix.
-    public function constructInstRequest(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse
+    /**
+     * @param  array<int|string, mixed>|null  $req_body
+     */
+    public function constructInstRequest(Request $request, string $url_piece, string $method, ?array $req_body): JsonResponse|HttpClientResponse
     {
         [$tok, $tokErr] = TokenHelper::GetToken($request);
 
@@ -302,7 +308,10 @@ class ApiController extends Controller
     }
 
     // Browser-facing proxy; long-running backend calls stream a keepalive before the wait.
-    public function constructInstRequestForBrowser(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse|StreamedResponse
+    /**
+     * @param  array<int|string, mixed>|null  $req_body
+     */
+    public function constructInstRequestForBrowser(Request $request, string $url_piece, string $method, ?array $req_body): JsonResponse|HttpClientResponse|StreamedResponse
     {
         if (! self::isValidateUploadRequest($url_piece)) {
             return ApiController::constructInstRequest($request, $url_piece, $method, $req_body);
@@ -1307,7 +1316,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
     }
 
-    public function updateBatch(Request $request, $inst_id, $batch_id): JsonResponse|HttpClientResponse
+    public function updateBatch(Request $request, string $inst_id, string $batch_id): JsonResponse|HttpClientResponse
     {
         try {
             // Validate required fields
@@ -1361,7 +1370,7 @@ class ApiController extends Controller
         }
     }
 
-    public function getEdaData(Request $request, $inst_id, $batch_id): JsonResponse|HttpClientResponse
+    public function getEdaData(Request $request, string $inst_id, string $batch_id): JsonResponse|HttpClientResponse
     {
         try {
             if (! $batch_id) {

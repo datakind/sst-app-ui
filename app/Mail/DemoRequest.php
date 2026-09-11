@@ -17,7 +17,10 @@ class DemoRequest extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($formData)
+    /**
+     * @param  array<string, mixed>  $formData
+     */
+    public function __construct(array $formData)
     {
         $this->formData = $formData;
     }
