@@ -8,7 +8,6 @@ import Alert from '@/Components/Alert';
 import Spinner from '@/Components/Spinner';
 
 export default function StartPrediction() {
-  const [currentStep] = useState(1);
   const [triggeredRun, setTriggeredRun] = useState(false);
   const [result, setResult] = useState('');
 
@@ -19,6 +18,7 @@ export default function StartPrediction() {
   const [terms, setTerms] = useState([]);
   const [selectedTerms, setSelectedTerms] = useState([]);
   const [loadingTerms, setLoadingTerms] = useState(false);
+  const [termsReason, setTermsReason] = useState(null);
   const [error, setError] = useState(null);
   useEffect(() => {
     axios
@@ -62,16 +62,30 @@ export default function StartPrediction() {
 
   useEffect(() => {
     if (!batchName || !modelName) return;
+    let cancelled = false;
     setLoadingTerms(true);
     axios
       .get('/eligible-inference-terms', {
         params: { batch_name: batchName, model_name: modelName },
       })
       .then(res => {
-        setTerms(res.data.terms);
+        if (cancelled) return;
+        setTerms(res.data.terms ?? []);
         setSelectedTerms([]);
+        setTermsReason(res.data.status === 'invalid' ? res.data.reason : null);
       })
-      .finally(() => setLoadingTerms(false));
+      .catch(() => {
+        if (cancelled) return;
+        setTerms([]);
+        setSelectedTerms([]);
+        setTermsReason('Could not load academic terms.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTerms(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [batchName, modelName]);
 
   const triggerInference = event => {
@@ -168,6 +182,7 @@ export default function StartPrediction() {
                 <select
                   className="mb-4 w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
                   id="batch_name"
+                  value={batchName}
                   onChange={e => setBatchName(e.target.value)}
                 >
                   {batchList.map(b => (
@@ -203,6 +218,7 @@ export default function StartPrediction() {
             <select
               className="mb-4 flex w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
               id="model_name"
+              value={modelName}
               onChange={e => setModelName(e.target.value)}
             >
               {modelsList.map(m => (
@@ -214,44 +230,46 @@ export default function StartPrediction() {
             <div className="flex w-full justify-center py-3">
               <Spinner mainMsg="Loading academic terms"></Spinner>
             </div>
+          ) : terms.length > 0 ? (
+            <>
+              <div className="py-3 font-thin">
+                <span className="text-2xl">Step 3</span>
+                <br />
+                <span className="text-lg">
+                  Please select the academic terms to predict.
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                {terms.map(t => (
+                  <label
+                    key={t.term_label}
+                    className="flex items-center gap-x-2 text-gray-700"
+                  >
+                    <input
+                      type="checkbox"
+                      name="academic_terms"
+                      value={t.term_label}
+                      checked={selectedTerms.includes(t.term_label)}
+                      onChange={e =>
+                        setSelectedTerms(prev =>
+                          e.target.checked
+                            ? [...prev, t.term_label]
+                            : prev.filter(x => x !== t.term_label),
+                        )
+                      }
+                      className="rounded border-gray-300"
+                    />
+                    <span className="capitalize">{t.term_label}</span>
+                    <span className="text-sm text-gray-500">
+                      ({t.valid_student_count} students)
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </>
           ) : (
-            terms.length > 0 && (
-              <>
-                <div className="py-3 font-thin">
-                  <span className="text-2xl">Step 3</span>
-                  <br />
-                  <span className="text-lg">
-                    Please select the academic terms to predict.
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                  {terms.map(t => (
-                    <label
-                      key={t.term_label}
-                      className="flex items-center gap-x-2 text-gray-700"
-                    >
-                      <input
-                        type="checkbox"
-                        name="academic_terms"
-                        value={t.term_label}
-                        checked={selectedTerms.includes(t.term_label)}
-                        onChange={e =>
-                          setSelectedTerms(prev =>
-                            e.target.checked
-                              ? [...prev, t.term_label]
-                              : prev.filter(x => x !== t.term_label),
-                          )
-                        }
-                        className="rounded border-gray-300"
-                      />
-                      <span className="capitalize">{t.term_label}</span>
-                      <span className="text-sm text-gray-500">
-                        ({t.valid_student_count} students)
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </>
+            termsReason && (
+              <div className="py-3 text-gray-700">{termsReason}</div>
             )
           )}
           <div className="flex w-full items-end justify-end pt-12">
@@ -279,7 +297,7 @@ export default function StartPrediction() {
       >
         {triggeredRun
           ? renderResults(result, error)
-          : renderPredictionParamInputs(currentStep)}
+          : renderPredictionParamInputs()}
       </div>
     </AppLayout>
   );
