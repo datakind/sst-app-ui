@@ -497,12 +497,6 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, '/eligible-inference-terms', 'GET', null);
     }
 
-    // Gets a single model, including the academic terms it was trained to infer on.
-    public function getModel(Request $request, string $model_name)
-    {
-        return ApiController::constructInstRequest($request, '/models/'.urlencode($model_name), 'GET', null);
-    }
-
     // Returns file as bytes
     public function fileBytes(Request $request, string $file_name)
     {

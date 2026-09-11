@@ -63,20 +63,13 @@ export default function StartPrediction() {
   useEffect(() => {
     if (!batchName || !modelName) return;
     setLoadingTerms(true);
-    Promise.all([
-      axios.get('/eligible-inference-terms', {
+    axios
+      .get('/eligible-inference-terms', {
         params: { batch_name: batchName, model_name: modelName },
-      }),
-      axios.get('/model-api/' + encodeURIComponent(modelName)),
-    ])
-      .then(([termsRes, modelRes]) => {
-        setTerms(termsRes.data.terms);
-        // The model's trained inference terms are the default selection.
-        setSelectedTerms(
-          modelRes.data.academic_terms.filter(label =>
-            termsRes.data.terms.some(t => t.term_label === label),
-          ),
-        );
+      })
+      .then(res => {
+        setTerms(res.data.terms);
+        setSelectedTerms([]);
       })
       .finally(() => setLoadingTerms(false));
   }, [batchName, modelName]);
