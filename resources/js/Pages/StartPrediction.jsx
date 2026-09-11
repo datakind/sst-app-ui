@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import BigSuccessAlert from '@/Components/BigSuccessAlert';
 import Alert from '@/Components/Alert';
+import Spinner from '@/Components/Spinner';
 
 export default function StartPrediction() {
   const [currentStep] = useState(1);
@@ -13,12 +14,18 @@ export default function StartPrediction() {
 
   const [batchList, setBatchList] = useState([]);
   const [modelsList, setModelsList] = useState([]);
+  const [batchName, setBatchName] = useState('');
+  const [modelName, setModelName] = useState('');
+  const [terms, setTerms] = useState([]);
+  const [selectedTerms, setSelectedTerms] = useState([]);
+  const [loadingTerms, setLoadingTerms] = useState(false);
   const [error, setError] = useState(null);
   useEffect(() => {
     axios
       .get('/models-api')
       .then(res => {
         setModelsList(res.data);
+        setModelName(res.data[0]?.name ?? '');
       })
       .catch(err => {
         if (
@@ -38,6 +45,7 @@ export default function StartPrediction() {
       .get('/view-uploaded-data')
       .then(res => {
         setBatchList(res.data.batches);
+        setBatchName(res.data.batches[0]?.name ?? '');
       })
       .catch(err => {
         if (
@@ -51,6 +59,27 @@ export default function StartPrediction() {
         }
       });
   }, []);
+
+  useEffect(() => {
+    if (!batchName || !modelName) return;
+    setLoadingTerms(true);
+    Promise.all([
+      axios.get('/eligible-inference-terms', {
+        params: { batch_name: batchName, model_name: modelName },
+      }),
+      axios.get('/model-api/' + encodeURIComponent(modelName)),
+    ])
+      .then(([termsRes, modelRes]) => {
+        setTerms(termsRes.data.terms);
+        // The model's trained inference terms are the default selection.
+        setSelectedTerms(
+          modelRes.data.academic_terms.filter(label =>
+            termsRes.data.terms.some(t => t.term_label === label),
+          ),
+        );
+      })
+      .finally(() => setLoadingTerms(false));
+  }, [batchName, modelName]);
 
   const triggerInference = event => {
     event.preventDefault();
@@ -69,6 +98,8 @@ export default function StartPrediction() {
       data: {
         batch_name: event.target.elements.batch_name.value,
         is_pdp: true,
+        // Omitted when nothing is checked, so the pipeline config decides.
+        term_filter: selectedTerms.length > 0 ? selectedTerms : null,
       },
     })
       .then(res => {
@@ -144,6 +175,7 @@ export default function StartPrediction() {
                 <select
                   className="mb-4 w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
                   id="batch_name"
+                  onChange={e => setBatchName(e.target.value)}
                 >
                   {batchList.map(b => (
                     <option key={b.batch_id ?? b.name}>{b.name}</option>
@@ -178,11 +210,56 @@ export default function StartPrediction() {
             <select
               className="mb-4 flex w-full rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
               id="model_name"
+              onChange={e => setModelName(e.target.value)}
             >
               {modelsList.map(m => (
                 <option key={m.name}>{m.name}</option>
               ))}
             </select>
+          )}
+          {loadingTerms ? (
+            <div className="flex w-full justify-center py-3">
+              <Spinner mainMsg="Loading academic terms"></Spinner>
+            </div>
+          ) : (
+            terms.length > 0 && (
+              <>
+                <div className="py-3 font-thin">
+                  <span className="text-2xl">Step 3</span>
+                  <br />
+                  <span className="text-lg">
+                    Please select the academic terms to predict.
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                  {terms.map(t => (
+                    <label
+                      key={t.term_label}
+                      className="flex items-center gap-x-2 text-gray-700"
+                    >
+                      <input
+                        type="checkbox"
+                        name="academic_terms"
+                        value={t.term_label}
+                        checked={selectedTerms.includes(t.term_label)}
+                        onChange={e =>
+                          setSelectedTerms(prev =>
+                            e.target.checked
+                              ? [...prev, t.term_label]
+                              : prev.filter(x => x !== t.term_label),
+                          )
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="capitalize">{t.term_label}</span>
+                      <span className="text-sm text-gray-500">
+                        ({t.valid_student_count} students)
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </>
+            )
           )}
           <div className="flex w-full items-end justify-end pt-12">
             <button type="submit" className="btn btn-primary">

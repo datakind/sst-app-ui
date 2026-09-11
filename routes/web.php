@@ -111,6 +111,8 @@ Route::middleware('auth.app')->group(function () {
     Route::post('/create-batch', [ApiController::class, 'createBatch']);
     Route::post('/create-model', [ApiController::class, 'createModelApi']);
     Route::get('/models-api', [ApiController::class, 'getModels']);
+    Route::get('/eligible-inference-terms', [ApiController::class, 'getEligibleInferenceTerms']);
+    Route::get('/model-api/{model_name}', [ApiController::class, 'getModel']);
     Route::get('/support-overview/{run_id}', [ApiController::class, 'getSupportOverview']);
     Route::get('/institutions/{inst_id}/inference/support-overview/{run_id}', [ApiController::class, 'getSupportOverview']);
     Route::get('/institutions/{inst_id}/training/model-cards/{model_run_id}', [ApiController::class, 'downloadModelCard']);
