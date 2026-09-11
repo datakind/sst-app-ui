@@ -685,8 +685,10 @@ class ApiController extends Controller
             $result = ApiController::constructInstRequest($request, '/input', 'GET', null);
             if ($result->status() === 200) {
                 $output = $result->json();
-                $batches = $output['batches'] ?? [];
-                $validCount = collect($batches)->filter(fn ($b) => empty($b['deleted']))->count();
+                $batches = is_array($output) && isset($output['batches']) && is_array($output['batches'])
+                    ? $output['batches']
+                    : [];
+                $validCount = collect($batches)->filter(fn ($b) => is_array($b) && empty($b['deleted']))->count();
                 $hasBatches = $validCount > 0;
             }
         }
