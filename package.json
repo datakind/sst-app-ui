@@ -81,5 +81,11 @@
     "plugins": [
       "prettier-plugin-tailwindcss"
     ]
+  },
+  "allowScripts": {
+    "core-js@3.49.0": true,
+    "es5-ext@0.10.64": true,
+    "fsevents@2.3.3": true,
+    "yarn@1.22.22": true
   }
 }
