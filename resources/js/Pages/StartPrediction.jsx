@@ -6,7 +6,7 @@ import { route } from 'ziggy-js';
 import BigSuccessAlert from '@/Components/BigSuccessAlert';
 import Alert from '@/Components/Alert';
 
-export default function RunInference() {
+export default function StartPrediction() {
   const [currentStep] = useState(1);
   const [triggeredRun, setTriggeredRun] = useState(false);
   const [result, setResult] = useState('');
@@ -65,7 +65,7 @@ export default function RunInference() {
     }
     axios({
       method: 'post',
-      url: '/run-inference/' + event.target.elements.model_name.value,
+      url: '/start-prediction/' + event.target.elements.model_name.value,
       data: {
         batch_name: event.target.elements.batch_name.value,
         is_pdp: true,
@@ -199,7 +199,7 @@ export default function RunInference() {
       title="Start Prediction"
       renderHeader={() => (
         <h2 className="text-xl leading-tight font-semibold text-gray-800">
-          Run Inference
+          Start Prediction
         </h2>
       )}
     >

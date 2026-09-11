@@ -470,7 +470,7 @@ class ApiController extends Controller
     }
 
     // Triggers inference run.
-    public function runInferenceApi(Request $request, string $model_name)
+    public function startPredictionApi(Request $request, string $model_name)
     {
         $post_request_body = [
             'batch_name' => $request->input('batch_name'),
