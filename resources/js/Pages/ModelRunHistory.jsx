@@ -23,10 +23,36 @@ export default function ModelRunHistory({ modelname }) {
   const [currentRunId, setCurrentRunId] = useState('');
   const [runToDelete, setRunToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   const closeDeleteModal = () => {
     if (!isDeleting) {
       setRunToDelete(null);
+    }
+  };
+
+  const closeArchiveModal = () => {
+    if (!isArchiving) {
+      setShowArchiveModal(false);
+    }
+  };
+
+  const archiveModel = async () => {
+    if (!modelInfo?.name) {
+      return;
+    }
+
+    setIsArchiving(true);
+    try {
+      await axios.patch(`/model/${modelInfo.name}/archive`);
+      window.location.assign(route('archived-models'));
+    } catch (err) {
+      const message =
+        err.response?.data?.error || err.message || 'Failed to archive model.';
+      setError(Error(message));
+      setShowArchiveModal(false);
+      setIsArchiving(false);
     }
   };
 
@@ -119,6 +145,12 @@ export default function ModelRunHistory({ modelname }) {
     fetchModel();
   }, [modelname]);
 
+  const canArchiveModel =
+    userIsDatakinder &&
+    !institution_view &&
+    modelInfo?.name &&
+    !modelInfo.archived;
+
   if (runToDelete) {
     return (
       <AppLayout title="Model Results">
@@ -147,6 +179,27 @@ export default function ModelRunHistory({ modelname }) {
 
   return (
     <AppLayout title="Model Results">
+      {showArchiveModal && (
+        <ConfirmationModal isOpen onClose={closeArchiveModal}>
+          <ConfirmationModal.Content title="Archive model">
+            Are you sure you want to archive &ldquo;
+            {formatModelName(modelInfo.name)}&rdquo;? It will be removed from
+            Model Results and listed on the Archived Models page.
+          </ConfirmationModal.Content>
+          <ConfirmationModal.Footer>
+            <SecondaryButton onClick={closeArchiveModal} disabled={isArchiving}>
+              Cancel
+            </SecondaryButton>
+            <DangerButton
+              className="ml-2"
+              onClick={archiveModel}
+              disabled={isArchiving}
+            >
+              {isArchiving ? 'Archiving...' : 'Archive'}
+            </DangerButton>
+          </ConfirmationModal.Footer>
+        </ConfirmationModal>
+      )}
       {
         <div
           className="mx-12 mb-12 flex w-full flex-col rounded-3xl bg-white p-8"
@@ -165,10 +218,21 @@ export default function ModelRunHistory({ modelname }) {
               id="main_content"
             >
               <h1>Model Run History</h1>
-              <div className="mt-4 text-center text-lg font-light">
-                {modelInfo == null || modelInfo == {}
-                  ? ''
-                  : `Current model: ${formatModelName(modelInfo.name)}`}
+              <div className="relative mt-4 w-full max-w-[1057px]">
+                <div className="text-center text-lg font-light">
+                  {modelInfo == null || modelInfo == {}
+                    ? ''
+                    : `Current model: ${formatModelName(modelInfo.name)}`}
+                </div>
+                {canArchiveModel && (
+                  <button
+                    type="button"
+                    className="text-link absolute top-0 right-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium"
+                    onClick={() => setShowArchiveModal(true)}
+                  >
+                    Archive Model
+                  </button>
+                )}
               </div>
 
               {error != null &&

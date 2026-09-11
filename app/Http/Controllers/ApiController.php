@@ -621,6 +621,16 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'DELETE', null);
     }
 
+    public function archiveModel(Request $request, string $model_name)
+    {
+        return ApiController::constructInstRequest(
+            $request,
+            '/models/'.urlencode($model_name).'/archive',
+            'PATCH',
+            null
+        );
+    }
+
     // This returns batch and file info for a given inst.
     public function viewUploadedData(Request $request)
     {
