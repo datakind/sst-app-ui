@@ -30,7 +30,7 @@ class DataDictionary extends Model
      *
      * @param  array<int, mixed>  $data
      */
-    public static function createFromArray(array $data)
+    public static function createFromArray(array $data): self
     {
         // Assuming the array structure is:
         // [dataset, field_name, region_type, category, details, field_label]

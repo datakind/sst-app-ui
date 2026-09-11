@@ -52,8 +52,12 @@ class InstitutionHelper
         }
     }
 
-    // Returns [inst_id, error]. Session is source of truth; non-DATAKINDER fallback is user row (synced at login).
-    public static function GetInstitution(Request $request)
+    /**
+     * Returns [inst_id, error]. Session is source of truth; non-DATAKINDER fallback is user row (synced at login).
+     *
+     * @return array{0: string, 1: string}
+     */
+    public static function GetInstitution(Request $request): array
     {
         $institution = session('institution');
         if (is_array($institution) && ($institution['inst_id'] ?? '') !== '') {

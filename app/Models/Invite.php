@@ -78,7 +78,7 @@ class Invite extends Model
     /**
      * Scope for valid invites
      */
-    public function scopeValid($query)
+    public function scopeValid($query): mixed
     {
         return $query->where('is_used', false)
             ->where('expires_at', '>', now());
@@ -87,7 +87,7 @@ class Invite extends Model
     /**
      * Scope for expired invites
      */
-    public function scopeExpired($query)
+    public function scopeExpired($query): mixed
     {
         return $query->where('expires_at', '<=', now());
     }
@@ -95,7 +95,7 @@ class Invite extends Model
     /**
      * Scope for unused invites
      */
-    public function scopeUnused($query)
+    public function scopeUnused($query): mixed
     {
         return $query->where('is_used', false);
     }

@@ -29,7 +29,7 @@ class DataDictionaryController extends Controller
 
         $modelsResp = $api->getModels($request);
         $models = $this->responseData($modelsResp);
-        Log::info('DataDictionary: models', ['count' => is_array($models) ? count($models) : 0, 'raw_status' => $modelsResp?->status()]);
+        Log::info('DataDictionary: models', ['count' => is_array($models) ? count($models) : 0, 'raw_status' => $modelsResp->status()]);
 
         if (! is_array($models) || count($models) === 0) {
             return Inertia::render('DataDictionary', [
@@ -63,7 +63,7 @@ class DataDictionaryController extends Controller
 
         $runsResp = $api->modelRunsWithContext($request, $modelName);
         $runs = $this->responseData($runsResp);
-        Log::info('DataDictionary: runs', ['count' => is_array($runs) ? count($runs) : 0, 'raw_status' => $runsResp?->status()]);
+        Log::info('DataDictionary: runs', ['count' => is_array($runs) ? count($runs) : 0, 'raw_status' => $runsResp->status()]);
 
         if (! is_array($runs) || count($runs) === 0) {
             return Inertia::render('DataDictionary', [

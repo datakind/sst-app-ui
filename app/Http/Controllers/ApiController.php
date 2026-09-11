@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\DataDictionary;
 use App\Traits\UsesApi;
+use Illuminate\Http\Client\Response as HttpClientResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use TokenHelper;
 use UserHelper;
 
@@ -49,7 +53,7 @@ class ApiController extends Controller
 
     // For local requests, mock out backend calls.
     // Temporarily disabled for rapid development with real API
-    public function isLocalRequest()
+    public function isLocalRequest(): bool
     {
         // Temporarily return false to use real API in local development.
         // Local mocks (including model_run_id on runs / getRunDetails) are only
@@ -65,7 +69,7 @@ class ApiController extends Controller
     }
 
     // Constructs a query for Datakinder cases that does not retrieve institution info.
-    public function constructDatakinderRequest(Request $request, string $url_piece, string $method, $req_body)
+    public function constructDatakinderRequest(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse
     {
         [$tok, $tokErr] = TokenHelper::GetToken($request);
         if ($tok == '') {
@@ -116,7 +120,7 @@ class ApiController extends Controller
         return $resp;
     }
 
-    public function addDatakinderApi(Request $request)
+    public function addDatakinderApi(Request $request): JsonResponse|HttpClientResponse
     {
         $emails_list = $request->input('emails');
         if ($emails_list == null || count($emails_list) == 0) {
@@ -137,7 +141,7 @@ class ApiController extends Controller
         return ApiController::constructDatakinderRequest($request, '/datakinders', 'POST', $emails_list);
     }
 
-    public function createInstApi(Request $request)
+    public function createInstApi(Request $request): JsonResponse|HttpClientResponse
     {
         if ($request->input('name') == null || $request->input('name') == '') {
             return response()->json(['error' => 'Name required.'], 400);
@@ -197,7 +201,7 @@ class ApiController extends Controller
         return ApiController::constructDatakinderRequest($request, '/institutions', 'POST', $post_request_body);
     }
 
-    public function viewAllInstitutions(Request $request)
+    public function viewAllInstitutions(Request $request): JsonResponse|HttpClientResponse
     {
         return ApiController::constructDatakinderRequest($request, '/institutions', 'GET', /* No POST body */ null);
     }
@@ -205,7 +209,7 @@ class ApiController extends Controller
     /**
      * GET /institutions/{current inst_id} — details for the institution in session (edit form).
      */
-    public function getCurrentInstitutionDetails(Request $request)
+    public function getCurrentInstitutionDetails(Request $request): JsonResponse
     {
         $resp = ApiController::constructInstRequest($request, '', 'GET', null);
         if ($resp instanceof JsonResponse) {
@@ -237,7 +241,7 @@ class ApiController extends Controller
     }
 
     // Constructs a query with the BACKEND_URL+/institutions/<inst> prefix.
-    public function constructInstRequest(Request $request, string $url_piece, string $method, $req_body)
+    public function constructInstRequest(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse
     {
         [$tok, $tokErr] = TokenHelper::GetToken($request);
 
@@ -298,7 +302,7 @@ class ApiController extends Controller
     }
 
     // Browser-facing proxy; long-running backend calls stream a keepalive before the wait.
-    public function constructInstRequestForBrowser(Request $request, string $url_piece, string $method, $req_body)
+    public function constructInstRequestForBrowser(Request $request, string $url_piece, string $method, $req_body): JsonResponse|HttpClientResponse|StreamedResponse
     {
         if (! self::isValidateUploadRequest($url_piece)) {
             return ApiController::constructInstRequest($request, $url_piece, $method, $req_body);
@@ -321,7 +325,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function EditInstApi(Request $request)
+    public function EditInstApi(Request $request): JsonResponse|HttpClientResponse
     {
         // Optional fields.
         $req_body = [];
@@ -375,7 +379,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, '', 'PATCH', $req_body);
     }
 
-    public function createModelApi(Request $request)
+    public function createModelApi(Request $request): JsonResponse|HttpClientResponse
     {
         if ($request->user()->access_type != 'DATAKINDER') {
             return response()->json(['error' => 'Only datakinders can perform this action'], 401);
@@ -393,7 +397,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, '/models/', 'POST', $post_request_body);
     }
 
-    public function createBatch(Request $request)
+    public function createBatch(Request $request): JsonResponse|HttpClientResponse
     {
 
         $post_request_body = [
@@ -427,7 +431,7 @@ class ApiController extends Controller
     }
 
     // Retrieves the GCS upload URL.
-    public function fileUploadApi(Request $request, string $filename)
+    public function fileUploadApi(Request $request, string $filename): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
             return response()->json('local-url-fake-signed', 200);
@@ -437,7 +441,7 @@ class ApiController extends Controller
     }
 
     // Validates a file that has been uploaded to the GCS bucket already.
-    public function fileValidateApi(Request $request, string $filename)
+    public function fileValidateApi(Request $request, string $filename): JsonResponse|HttpClientResponse|StreamedResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -448,7 +452,7 @@ class ApiController extends Controller
     }
 
     // This shows all output data.
-    public function viewOutputData(Request $request)
+    public function viewOutputData(Request $request): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -460,7 +464,7 @@ class ApiController extends Controller
     }
 
     // Downloading inference output
-    public function downloadInfData(Request $request, string $filename)
+    public function downloadInfData(Request $request, string $filename): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
             return response()->json('local-url-fake-signed', 200);
@@ -470,7 +474,7 @@ class ApiController extends Controller
     }
 
     // Triggers prediction run.
-    public function startPredictionApi(Request $request, string $model_name)
+    public function startPredictionApi(Request $request, string $model_name): JsonResponse|HttpClientResponse
     {
         $post_request_body = [
             'batch_name' => $request->input('batch_name'),
@@ -486,19 +490,19 @@ class ApiController extends Controller
     }
 
     // Gets list of models for a given institution
-    public function getModels(Request $request)
+    public function getModels(Request $request): JsonResponse|HttpClientResponse
     {
         return ApiController::constructInstRequest($request, '/models', 'GET', null);
     }
 
     // Academic terms in a batch that have students eligible for the given model.
-    public function getEligibleInferenceTerms(Request $request)
+    public function getEligibleInferenceTerms(Request $request): JsonResponse|HttpClientResponse
     {
         return ApiController::constructInstRequest($request, '/eligible-inference-terms', 'GET', null);
     }
 
     // Returns file as bytes
-    public function fileBytes(Request $request, string $file_name)
+    public function fileBytes(Request $request, string $file_name): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
             return response()->json(null, 200);
@@ -508,7 +512,7 @@ class ApiController extends Controller
     }
 
     // Returns file as json
-    public function fileJson(Request $request, string $file_name)
+    public function fileJson(Request $request, string $file_name): JsonResponse
     {
         if (ApiController::isLocalRequest()) {
             return response()->json(null, 200);
@@ -532,7 +536,7 @@ class ApiController extends Controller
     }
 
     // Returns file as png type
-    public function filePng(Request $request, string $file_name)
+    public function filePng(Request $request, string $file_name): JsonResponse|HttpResponse
     {
         if (ApiController::isLocalRequest()) {
             return response()->json(null, 200);
@@ -545,7 +549,7 @@ class ApiController extends Controller
         return response($file->body())->header('Content-Type', 'image/png');
     }
 
-    public function convertDateToReadable(string $date_str)
+    public function convertDateToReadable(string $date_str): string
     {
         // Convert date to readable string.
         // The strings start off with type "2025-02-25T19:48:43"
@@ -555,7 +559,7 @@ class ApiController extends Controller
         return $date_val[1].'/'.$date_val[2].'/'.$date_val[0].' '.$first_parse[1];
     }
 
-    public function modelRuns(Request $request, string $model_name)
+    public function modelRuns(Request $request, string $model_name): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -600,7 +604,7 @@ class ApiController extends Controller
         return $result;
     }
 
-    public function deleteModelRun(Request $request, string $model_name, string $run_id)
+    public function deleteModelRun(Request $request, string $model_name, string $run_id): JsonResponse|HttpClientResponse
     {
         \Log::info('deleteModelRun called with model_name: '.$model_name.', run_id: '.$run_id);
 
@@ -622,7 +626,7 @@ class ApiController extends Controller
     }
 
     // This returns batch and file info for a given inst.
-    public function viewUploadedData(Request $request)
+    public function viewUploadedData(Request $request): JsonResponse|HttpClientResponse
     {
         // convert the user ids to names here prior to submission
         $result = ApiController::constructInstRequest($request, '/input', 'GET', null);
@@ -664,13 +668,13 @@ class ApiController extends Controller
      * Redirect to the appropriate app home: EDA dashboard if the user's institution
      * has at least one valid (non-deleted) batch, otherwise the generic home page.
      */
-    public function appHomeRedirect(Request $request)
+    public function appHomeRedirect(Request $request): RedirectResponse
     {
         $hasBatches = false;
         $inst_id = ($request->attributes->get('institution') ?? [])['inst_id'] ?? null;
         if ($request->user() && $inst_id) {
             $result = ApiController::constructInstRequest($request, '/input', 'GET', null);
-            if ($result !== null && $result->status() === 200) {
+            if ($result->status() === 200) {
                 $output = $result->json();
                 $batches = $output['batches'] ?? [];
                 $validCount = collect($batches)->filter(fn ($b) => empty($b['deleted']))->count();
@@ -684,7 +688,7 @@ class ApiController extends Controller
     }
 
     // The below provided by DK.
-    public function exampleFunction(Request $request)
+    public function exampleFunction(Request $request): HttpClientResponse
     {
         $query = http_build_query($request->query());
         $token = $this->authenticateDkApi(null);
@@ -698,7 +702,7 @@ class ApiController extends Controller
     }
 
     // Gets support overview data for a given run
-    public function getSupportOverview(Request $request, string $inst_id, string $run_id)
+    public function getSupportOverview(Request $request, string $inst_id, string $run_id): JsonResponse|HttpClientResponse
     {
         \Log::info('getSupportOverview called with inst_id: '.$inst_id.', run_id: '.$run_id);
 
@@ -789,7 +793,7 @@ class ApiController extends Controller
     }
 
     // Gets run details for a specific model run
-    public function getRunDetails(Request $request, string $inst_id, string $model_name, string $run_id)
+    public function getRunDetails(Request $request, string $inst_id, string $model_name, string $run_id): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
             // Mock return based on run_id 123
@@ -837,7 +841,7 @@ class ApiController extends Controller
     }
 
     // Downloads model card for a given model run (model_run_id from inference job)
-    public function downloadModelCard(Request $request, string $inst_id, string $model_run_id)
+    public function downloadModelCard(Request $request, string $inst_id, string $model_run_id): JsonResponse|HttpClientResponse|StreamedResponse
     {
         \Log::info('downloadModelCard called with inst_id: '.$inst_id.', model_run_id: '.$model_run_id);
         \Log::info('Production request - Institution ID: '.$inst_id);
@@ -848,7 +852,7 @@ class ApiController extends Controller
         $response = ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
 
         // If we got a successful response, add download headers
-        if ($response && $response->status() == 200) {
+        if ($response->status() == 200) {
             $name = $request->query('name', '');
             $name = is_string($name) ? $name : '';
             $segment = preg_replace('/[^A-Za-z0-9_-]/', '', $name);
@@ -875,7 +879,7 @@ class ApiController extends Controller
     }
 
     // Gets top features for a given run
-    public function getTopFeatures(Request $request, string $inst_id, string $run_id)
+    public function getTopFeatures(Request $request, string $inst_id, string $run_id): JsonResponse|HttpClientResponse
     {
         \Log::info('getTopFeatures called with inst_id: '.$inst_id.', run_id: '.$run_id);
 
@@ -945,7 +949,7 @@ class ApiController extends Controller
     }
 
     // Gets model runs using request context for institution
-    public function modelRunsWithContext(Request $request, string $model_name)
+    public function modelRunsWithContext(Request $request, string $model_name): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -991,7 +995,7 @@ class ApiController extends Controller
     }
 
     // Gets features boxplot statistics for a given run and feature
-    public function getFeaturesBoxplotStat(Request $request, string $inst_id, string $run_id)
+    public function getFeaturesBoxplotStat(Request $request, string $inst_id, string $run_id): JsonResponse|HttpClientResponse
     {
         \Log::info('getFeaturesBoxplotStat called with inst_id: '.$inst_id.', run_id: '.$run_id);
         \Log::info('getFeaturesBoxplotStat feature_name: '.$request->query('feature_name'));
@@ -1044,7 +1048,7 @@ class ApiController extends Controller
     }
 
     // Gets top features using request context for institution
-    public function getTopFeaturesWithContext(Request $request, string $run_id)
+    public function getTopFeaturesWithContext(Request $request, string $run_id): JsonResponse|HttpClientResponse
     {
         \Log::info('getTopFeaturesWithContext called with run_id: '.$run_id);
 
@@ -1120,7 +1124,7 @@ class ApiController extends Controller
     }
 
     // Deletes a batch using request context for institution
-    public function deleteBatchWithContext(Request $request, string $batch_id)
+    public function deleteBatchWithContext(Request $request, string $batch_id): JsonResponse|HttpClientResponse
     {
         \Log::info('deleteBatchWithContext called with batch_id: '.$batch_id);
 
@@ -1142,7 +1146,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'DELETE', null);
     }
 
-    public function getFeatureImportance(Request $request, string $inst_id, string $model_run_id)
+    public function getFeatureImportance(Request $request, string $inst_id, string $model_run_id): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -1174,7 +1178,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
     }
 
-    public function getConfusionMatrix(Request $request, string $inst_id, string $model_run_id)
+    public function getConfusionMatrix(Request $request, string $inst_id, string $model_run_id): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -1197,7 +1201,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
     }
 
-    public function getRocCurve(Request $request, string $inst_id, string $model_run_id)
+    public function getRocCurve(Request $request, string $inst_id, string $model_run_id): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -1241,7 +1245,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
     }
 
-    public function getTrainingSupportOverview(Request $request, string $inst_id, string $model_run_id)
+    public function getTrainingSupportOverview(Request $request, string $inst_id, string $model_run_id): JsonResponse|HttpClientResponse
     {
         if (ApiController::isLocalRequest()) {
 
@@ -1303,7 +1307,7 @@ class ApiController extends Controller
         return ApiController::constructInstRequest($request, $externalUrl, 'GET', null);
     }
 
-    public function updateBatch(Request $request, $inst_id, $batch_id)
+    public function updateBatch(Request $request, $inst_id, $batch_id): JsonResponse|HttpClientResponse
     {
         try {
             // Validate required fields
@@ -1357,7 +1361,7 @@ class ApiController extends Controller
         }
     }
 
-    public function getEdaData(Request $request, $inst_id, $batch_id)
+    public function getEdaData(Request $request, $inst_id, $batch_id): JsonResponse|HttpClientResponse
     {
         try {
             if (! $batch_id) {
