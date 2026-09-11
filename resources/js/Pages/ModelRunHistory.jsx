@@ -49,9 +49,7 @@ export default function ModelRunHistory({ modelname }) {
       window.location.assign(route('archived-models'));
     } catch (err) {
       const message =
-        err.response?.data?.error ||
-        err.message ||
-        'Failed to archive model.';
+        err.response?.data?.error || err.message || 'Failed to archive model.';
       setError(Error(message));
       setShowArchiveModal(false);
       setIsArchiving(false);
@@ -189,10 +187,7 @@ export default function ModelRunHistory({ modelname }) {
             Model Results and listed on the Archived Models page.
           </ConfirmationModal.Content>
           <ConfirmationModal.Footer>
-            <SecondaryButton
-              onClick={closeArchiveModal}
-              disabled={isArchiving}
-            >
+            <SecondaryButton onClick={closeArchiveModal} disabled={isArchiving}>
               Cancel
             </SecondaryButton>
             <DangerButton
@@ -232,7 +227,7 @@ export default function ModelRunHistory({ modelname }) {
                 {canArchiveModel && (
                   <button
                     type="button"
-                    className="absolute top-0 right-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium text-link"
+                    className="text-link absolute top-0 right-0 cursor-pointer border-0 bg-transparent p-0 text-sm font-medium"
                     onClick={() => setShowArchiveModal(true)}
                   >
                     Archive Model
