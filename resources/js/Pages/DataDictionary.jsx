@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import PropTypes from 'prop-types';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeading from '@/Components/PageHeading';
@@ -170,6 +170,7 @@ const MODEL_CARD_SECTIONS = [
 
 export default function DataDictionary({
   features = [],
+  models = [],
   selectedModel = null,
 }) {
   usePage().props; // shared props (e.g. institution) available if needed
@@ -397,6 +398,20 @@ export default function DataDictionary({
                 </TabPanel>
                 {selectedModel && (
                   <TabPanel>
+                    {models.length > 1 && (
+                      <select
+                        aria-label="Model"
+                        className="mb-4 ml-4 w-64 rounded-full border border-gray-200 bg-white px-6 py-2 text-gray-700 focus:border-gray-500 focus:outline-none"
+                        value={selectedModel.name}
+                        onChange={e =>
+                          router.reload({ data: { model: e.target.value } })
+                        }
+                      >
+                        {models.map(m => (
+                          <option key={m}>{m}</option>
+                        ))}
+                      </select>
+                    )}
                     <div className="relative ml-4 w-64">
                       <input
                         type="text"
@@ -556,5 +571,6 @@ export default function DataDictionary({
 
 DataDictionary.propTypes = {
   features: PropTypes.arrayOf(PropTypes.object),
+  models: PropTypes.arrayOf(PropTypes.string),
   selectedModel: PropTypes.object,
 };

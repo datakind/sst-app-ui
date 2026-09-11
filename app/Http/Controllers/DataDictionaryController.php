@@ -39,7 +39,9 @@ class DataDictionaryController extends Controller
             ]);
         }
 
-        $validModel = collect($models)->first(fn ($m) => ($m['valid'] ?? false) === true || ($m['valid'] ?? 0) === 1);
+        $validModels = collect($models)->filter(fn ($m) => ($m['valid'] ?? false) === true || ($m['valid'] ?? 0) === 1)->values();
+        $modelNames = $validModels->pluck('name')->all();
+        $validModel = $validModels->firstWhere('name', $request->query('model')) ?? $validModels->first();
         if (! $validModel) {
             Log::info('DataDictionary: no valid model');
 
@@ -56,6 +58,7 @@ class DataDictionaryController extends Controller
         if (! $modelName) {
             return Inertia::render('DataDictionary', [
                 'selectedModel' => $validModel,
+                'models' => $modelNames,
                 'mostRecentRun' => null,
                 'features' => [],
             ]);
@@ -68,6 +71,7 @@ class DataDictionaryController extends Controller
         if (! is_array($runs) || count($runs) === 0) {
             return Inertia::render('DataDictionary', [
                 'selectedModel' => $validModel,
+                'models' => $modelNames,
                 'mostRecentRun' => null,
                 'features' => [],
             ]);
@@ -98,6 +102,7 @@ class DataDictionaryController extends Controller
 
         return Inertia::render('DataDictionary', [
             'selectedModel' => $validModel,
+            'models' => $modelNames,
             'mostRecentRun' => $mostRecentRun,
             'features' => $features,
         ]);
