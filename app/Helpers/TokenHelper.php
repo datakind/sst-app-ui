@@ -12,7 +12,10 @@ class TokenHelper
 
     // Get the Backend API token for that user, saving it in the session or regenerating if it is close to expiration.
     // The return is an array of two elements, the token, and an error message if any.
-    public static function getToken(Request $request)
+    /**
+     * @return array{0: mixed, 1: string}
+     */
+    public static function getToken(Request $request): array
     {
         $backend_tok = $request->session()->get('api_jwt');
 
@@ -30,7 +33,10 @@ class TokenHelper
         return [$backend_tok, ''];
     }
 
-    public static function makeTokenAPICall(Request $request)
+    /**
+     * @return array{0: mixed, 1: string}
+     */
+    public static function makeTokenAPICall(Request $request): array
     {
         $headers = [
             'X-API-KEY' => config('services.backend.api_key'),

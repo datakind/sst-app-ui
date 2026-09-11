@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class UserHelper
 {
     // Checks if a given email is a valid existing user. Returns either error or empty string if no error.
-    public static function checkEmailExists(string $email)
+    public static function checkEmailExists(string $email): string
     {
 
         $users = DB::table('users')->where('email', $email)
@@ -22,9 +22,14 @@ class UserHelper
         return '';
     }
 
-    // Returns a mapping of the names of a set of users given their user id.
-    // Returns false if no user found.
-    public static function getNames(array $user_uuids)
+    /**
+     * Returns a mapping of the names of a set of users given their user id.
+     * Returns false if no user found.
+     *
+     * @param  array<int, mixed>  $user_uuids
+     * @return array<int|string, mixed>|false
+     */
+    public static function getNames(array $user_uuids): array|false
     {
         $users = DB::table('users')->whereIn('id', $user_uuids)
             ->get();

@@ -24,6 +24,7 @@ use Laravel\Jetstream\Team as JetstreamTeam;
  */
 class Team extends JetstreamTeam
 {
+    /** @use HasFactory<\Database\Factories\TeamFactory> */
     use HasFactory;
     use Uuid;
 

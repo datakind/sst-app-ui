@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\DemoRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DemoRequestController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',

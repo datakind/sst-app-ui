@@ -57,6 +57,9 @@ class ModelResultsOverviewController extends Controller
         ]);
     }
 
+    /**
+     * @return array<int|string, mixed>|null
+     */
     private function responseData(HttpClientResponse|JsonResponse|null $response): ?array
     {
         if ($response === null) {

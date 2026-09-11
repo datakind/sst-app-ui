@@ -12,12 +12,13 @@ class DemoRequest extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $formData;
+    /** @var array<string, mixed> */
+    public array $formData;
 
     /**
-     * Create a new message instance.
+     * @param  array<string, mixed>  $formData
      */
-    public function __construct($formData)
+    public function __construct(array $formData)
     {
         $this->formData = $formData;
     }

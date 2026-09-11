@@ -42,6 +42,8 @@ class DataDictionarySeeder extends Seeder
 
     /**
      * Fetch data dictionary from the API.
+     *
+     * @return array<int|string, mixed>
      */
     protected function getDataDictionary(): array
     {
@@ -70,6 +72,8 @@ class DataDictionarySeeder extends Seeder
 
     /**
      * Parse a complex string that includes commas inside quotes.
+     *
+     * @return array<int, string>
      */
     private function parseComplexString(string $input): array
     {

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataDictionary extends Model
 {
+    /** @use HasFactory<\Illuminate\Database\Eloquent\Factories\Factory<static>> */
     use HasFactory;
 
     // Specify the table associated with the model
@@ -25,8 +26,12 @@ class DataDictionary extends Model
     // Indicate that the model should use timestamps
     public $timestamps = true;
 
-    // Add a method to parse and save the array data
-    public static function createFromArray(array $data)
+    /**
+     * Add a method to parse and save the array data.
+     *
+     * @param  array<int, mixed>  $data
+     */
+    public static function createFromArray(array $data): self
     {
         // Assuming the array structure is:
         // [dataset, field_name, region_type, category, details, field_label]

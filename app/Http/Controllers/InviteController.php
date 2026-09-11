@@ -6,19 +6,21 @@ use App\Helpers\InstitutionHelper;
 use App\Models\Invite;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class InviteController extends Controller
 {
     /**
      * Show the invite validation form
      */
-    public function showInviteForm()
+    public function showInviteForm(): InertiaResponse
     {
         return Inertia::render('Auth/InviteValidation');
     }
@@ -26,7 +28,7 @@ class InviteController extends Controller
     /**
      * Validate an invite code and show registration form
      */
-    public function validateInvite(Request $request)
+    public function validateInvite(Request $request): RedirectResponse
     {
         $request->validate([
             'invite_code' => 'required|string|max:64',
@@ -68,7 +70,7 @@ class InviteController extends Controller
     /**
      * Show the registration form (only accessible with valid invite)
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm(): InertiaResponse|RedirectResponse
     {
         if (! session('valid_invite')) {
             return redirect()->route('invite.validation');
@@ -93,7 +95,7 @@ class InviteController extends Controller
     /**
      * Process user registration
      */
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
 
         if (! session('valid_invite')) {
@@ -212,7 +214,7 @@ class InviteController extends Controller
     /**
      * Create an invite (admin only)
      */
-    public function createInvite(Request $request)
+    public function createInvite(Request $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email|unique:users,email',
@@ -238,7 +240,7 @@ class InviteController extends Controller
     /**
      * Send invite email
      */
-    private function sendInviteEmail(Invite $invite)
+    private function sendInviteEmail(Invite $invite): void
     {
         // TODO: Create and send invite email
         // This would typically use Laravel's Mail facade
@@ -249,7 +251,7 @@ class InviteController extends Controller
     /**
      * List all invites (admin only)
      */
-    public function listInvites(Request $request)
+    public function listInvites(Request $request): InertiaResponse
     {
         $perPageParam = $request->input('per_page', 20);
 
@@ -279,7 +281,7 @@ class InviteController extends Controller
     /**
      * Resend invite (admin only)
      */
-    public function resendInvite(Invite $invite)
+    public function resendInvite(Invite $invite): RedirectResponse
     {
         if ($invite->is_used) {
             return back()->withErrors([
@@ -301,7 +303,7 @@ class InviteController extends Controller
     /**
      * Delete invite (admin only)
      */
-    public function deleteInvite(Invite $invite)
+    public function deleteInvite(Invite $invite): RedirectResponse
     {
         if ($invite->is_used) {
             return back()->withErrors([
