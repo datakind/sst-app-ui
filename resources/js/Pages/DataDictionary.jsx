@@ -214,32 +214,20 @@ export default function DataDictionary({
         <PageHeading>Data Dictionary</PageHeading>
 
         <div className="shadow-card mx-auto max-w-5xl rounded-[40px] bg-white px-10 py-10 sm:px-12">
-          {/* Submission Data Requirements */}
           <div className="mb-10">
             <h2 className="text-heading mb-4 text-3xl font-light">
-              Submission Data Requirements
+              About the Data Dictionary
             </h2>
-            <p className="mb-4 text-xl font-light text-[#171717]">
-              DataKind receives de-identified &ldquo;Analysis Ready (AR)&rdquo;
-              files from the National Student Clearinghouse (NSC) using a
-              &ldquo;StudyID&rdquo; field. Users should upload files aligned
-              with{' '}
-              <a
-                href="https://www.studentclearinghouse.org/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link font-medium underline"
-              >
-                AR file templates provided by NSC
-              </a>
-              .
+            <p>
+              This page explains the data that is available when you have a
+              model result in the app. <b>Understanding Your Results</b> lists
+              the column names of the output data, and how you should interpret
+              them. <b>Indicator Glossary</b> describes the indicators that each
+              specific model contains and how they are calculated.{' '}
+              <b>Data Science Terminology</b> defines specific language from the
+              Data Science domain that is used throughout the model
+              results.{' '}
             </p>
-            <div className="border-secondary bg-landing-light-blue border-l-4 py-3 pr-4 pl-4 text-xl font-light text-[#171717]">
-              <span className="font-semibold">Important:</span> If uploading a
-              StudyID file, the &ldquo;Student ID&rdquo; column must be deleted.
-              Only &ldquo;Study ID&rdquo; or &ldquo;Student GUID&rdquo; (both in
-              quotes) should be included in data uploaded to Edvise.
-            </div>
           </div>
 
           {/* Tabs */}
